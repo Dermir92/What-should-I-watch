@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ':*)",
+      "Bash(node -e ':*)",
+      "Bash(del \"C:\\\\Users\\\\Danni\\\\Desktop\\\\Repos\\\\What-should-I-watch\\\\_tmp_script.js\")",
+      "Bash(rm _tmp_script.js)"
+    ]
+  }
+}
