@@ -314,11 +314,12 @@ header h1 em { color:#c084fc; font-style:italic; }
   <div class="header-eyebrow">🎬 Film & TV Discovery</div>
   <h1>What Should I <em>Watch</em>?</h1>
   <p class="header-tagline">Find the perfect show — in seconds.</p>
-  <p class="header-sub">TV Shows · Documentaries · Powered by TVmaze</p>
+  <p class="header-sub">Movies · TV Shows · Documentaries · Powered by <a href="https://trakt.tv" target="_blank" rel="noopener" style="color:rgba(255,249,240,.55);text-decoration:underline">Trakt</a> &amp; <a href="https://www.tvmaze.com" target="_blank" rel="noopener" style="color:rgba(255,249,240,.55);text-decoration:underline">TVmaze</a></p>
 </header>
 
 <div id="nav-tabs">
-  <button class="nav-tab active" data-page="tv"><span class="nav-icon">📺</span><span>TV Shows</span></button>
+  <button class="nav-tab active" data-page="movies"><span class="nav-icon">🎬</span><span>Movies</span></button>
+  <button class="nav-tab" data-page="tv"><span class="nav-icon">📺</span><span>TV Shows</span></button>
   <button class="nav-tab" data-page="docs"><span class="nav-icon">🎥</span><span>Docs</span></button>
   <button class="nav-tab" data-page="decide"><span class="nav-icon">🎲</span><span>Can't Decide</span></button>
   <button class="nav-tab" data-page="mylist"><span class="nav-icon">❤️</span><span>My List</span></button>
@@ -608,7 +609,13 @@ header h1 em { color:#c084fc; font-style:italic; }
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// TVmaze genre list
+const GENRE_PILLS_MOVIE = [
+  {id:'all',label:'All'},{id:'action',label:'Action'},{id:'adventure',label:'Adventure'},
+  {id:'animation',label:'Animation'},{id:'comedy',label:'Comedy'},{id:'crime',label:'Crime'},
+  {id:'drama',label:'Drama'},{id:'fantasy',label:'Fantasy'},{id:'history',label:'History'},
+  {id:'horror',label:'Horror'},{id:'mystery',label:'Mystery'},{id:'romance',label:'Romance'},
+  {id:'science-fiction',label:'Sci-Fi'},{id:'thriller',label:'Thriller'},{id:'western',label:'Western'}
+];
 const GENRE_PILLS_TV = [
   {id:'all',label:'All'},{id:'Action',label:'Action'},{id:'Adventure',label:'Adventure'},
   {id:'Anime',label:'Anime'},{id:'Animation',label:'Animation'},{id:'Comedy',label:'Comedy'},
@@ -618,57 +625,74 @@ const GENRE_PILLS_TV = [
   {id:'Thriller',label:'Thriller'},{id:'Western',label:'Western'}
 ];
 
-// Documentary-style genres on TVmaze
 const DOC_GENRES = ['History','Nature','Food','Travel','DIY','Sports','Music','Espionage'];
 
-const MOOD_TV_GENRE = {
-  feelgood: 'Comedy',
-  action:   'Action',
-  scary:    'Horror',
-  drama:    'Drama',
-  romance:  'Romance',
-  mystery:  'Mystery',
-  scifi:    'Science-Fiction',
-  dark:     'Crime',
-  fantasy:  'Fantasy',
-  anime:    'Anime'
+const MOOD_TRAKT = {
+  feelgood:'comedy', action:'action', scary:'horror', drama:'drama',
+  romance:'romance', mystery:'mystery', scifi:'science-fiction',
+  dark:'thriller', fantasy:'fantasy'
+};
+const MOOD_TV = {
+  feelgood:'Comedy', action:'Action', scary:'Horror', drama:'Drama',
+  romance:'Romance', mystery:'Mystery', scifi:'Science-Fiction',
+  dark:'Crime', fantasy:'Fantasy'
+};
+const MOOD_REASONS = {
+  feelgood:'A crowd-pleaser guaranteed to lift your spirits.',
+  action:'High-octane entertainment to get your adrenaline pumping.',
+  scary:'Genuinely creepy — maybe don\'t watch alone.',
+  drama:'A deeply moving story that will stay with you.',
+  romance:'The perfect excuse to get cosy on the sofa.',
+  mystery:'A gripping puzzle you won\'t be able to stop thinking about.',
+  scifi:'Mind-bending storytelling that asks the big questions.',
+  dark:'Intense, atmospheric, and absolutely gripping.',
+  fantasy:'An escapist adventure into another world.',
+  all:'A top-rated title picked just for you tonight.'
 };
 
-const MOOD_REASONS = {
-  feelgood: 'A crowd-pleaser guaranteed to lift your spirits.',
-  action:   'High-octane entertainment to get your adrenaline pumping.',
-  scary:    'Genuinely creepy — maybe don\'t watch alone.',
-  drama:    'A deeply moving story that will stay with you.',
-  romance:  'The perfect excuse to get cosy on the sofa.',
-  mystery:  'A gripping puzzle you won\'t be able to stop thinking about.',
-  scifi:    'Mind-bending storytelling that asks the big questions.',
-  dark:     'Intense, atmospheric, and absolutely gripping.',
-  fantasy:  'An escapist adventure into another world.',
-  anime:    'Stunning animation with epic storytelling.',
-  all:      'A top-rated title picked just for you tonight.'
+const GENRE_GRAD = {
+  action:'linear-gradient(135deg,#6b1a1a,#b02a2a)',
+  adventure:'linear-gradient(135deg,#0f3a1e,#1e7a3e)',
+  animation:'linear-gradient(135deg,#0f2a5a,#1a60a8)',
+  comedy:'linear-gradient(135deg,#5a3800,#c47f0a)',
+  crime:'linear-gradient(135deg,#16162e,#3a3a6a)',
+  documentary:'linear-gradient(135deg,#0f2a32,#12786a)',
+  drama:'linear-gradient(135deg,#231040,#6b2fa8)',
+  fantasy:'linear-gradient(135deg,#12104a,#5b2ea8)',
+  history:'linear-gradient(135deg,#2e1e0a,#7a5a1a)',
+  horror:'linear-gradient(135deg,#080808,#3a0808)',
+  mystery:'linear-gradient(135deg,#080e1e,#123a6a)',
+  romance:'linear-gradient(135deg,#3a0e1e,#a82a50)',
+  'science-fiction':'linear-gradient(135deg,#060e20,#0e3a6a)',
+  thriller:'linear-gradient(135deg,#0a0a12,#2a0a3a)',
+  western:'linear-gradient(135deg,#281400,#7a4010)',
+  default:'linear-gradient(135deg,#120820,#3a1a60)'
+};
+const GENRE_EMOJI = {
+  action:'💥', adventure:'🗺️', animation:'✏️', comedy:'😂', crime:'🔫',
+  documentary:'🎥', drama:'🎭', fantasy:'🧙', history:'📜', horror:'👻',
+  mystery:'🔍', romance:'💕', 'science-fiction':'🚀', thriller:'🔪', western:'🤠'
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════════════
 const S = {
-  tab:           'tv',
-  items:         [],
-  loading:       false,
-  genre:         'all',
-  mood:          'all',
-  search:        '',
-  tvRawShows:    [],
-  tvDisplayStart:0,
-  tvMazePage:    0,
-  tvExhausted:   false,
-  // modal
-  modalId:       null,
-  modalType:     null,
-  // decide
-  decideType:    'tv',
-  decideMood:    'all',
-  // persisted
+  tab: 'movies',
+  items: [],
+  loading: false,
+  genre: 'all',
+  mood: 'all',
+  search: '',
+  sortMode: 'popular',
+  traktPage: 1,
+  tvRawShows: [],
+  tvDisplayStart: 0,
+  tvMazePage: 0,
+  tvExhausted: false,
+  modalId: null,
+  decideType: 'movie',
+  decideMood: 'all',
   watchlist: loadLS('watchlist', []),
   watched:   loadLS('watched',   []),
   ratings:   loadLS('ratings',   {}),
@@ -684,6 +708,12 @@ function saveLS(k, v) { localStorage.setItem('wsw_'+k, JSON.stringify(v)); }
 // ═══════════════════════════════════════════════════════════════════════════
 // API
 // ═══════════════════════════════════════════════════════════════════════════
+async function trakt(traktpath, params) {
+  const qs = new URLSearchParams(Object.assign({ traktpath }, params || {}));
+  const r  = await fetch('/api/trakt?' + qs);
+  if (!r.ok) throw new Error('Trakt error ' + r.status);
+  return r.json();
+}
 async function tvmaze(tvpath, params) {
   const qs = new URLSearchParams(Object.assign({ tvpath }, params || {}));
   const r  = await fetch('/api/tvmaze?' + qs);
@@ -694,24 +724,52 @@ async function tvmaze(tvpath, params) {
 // ═══════════════════════════════════════════════════════════════════════════
 // NORMALISE
 // ═══════════════════════════════════════════════════════════════════════════
+function normTrakt(raw) {
+  const m = raw.movie || raw;
+  return {
+    id: 'trakt_' + m.ids.trakt,
+    source: 'movie',
+    traktId: m.ids.trakt,
+    traktSlug: m.ids.slug,
+    title: m.title || 'Unknown',
+    year: m.year || '',
+    poster: null,
+    genres: m.genres || [],
+    rating: m.rating ? m.rating.toFixed(1) : null,
+    runtime: m.runtime ? m.runtime + ' min' : '',
+    overview: m.overview || '',
+    certification: m.certification || '',
+    trailer: m.trailer || null,
+    raw: m
+  };
+}
 function normTV(show) {
   return {
-    id:       'tv_' + show.id,
-    source:   'tv',
-    tvId:     show.id,
-    title:    show.name     || 'Unknown',
-    year:     show.premiered ? show.premiered.slice(0,4) : '',
-    poster:   show.image && show.image.medium   ? show.image.medium   : null,
+    id: 'tv_' + show.id,
+    source: 'tv',
+    tvId: show.id,
+    title: show.name || 'Unknown',
+    year: show.premiered ? show.premiered.slice(0,4) : '',
+    poster: show.image && show.image.medium   ? show.image.medium   : null,
     backdrop: show.image && show.image.original ? show.image.original : null,
-    genres:   show.genres   || [],
-    rating:   show.rating && show.rating.average ? show.rating.average : null,
-    overview: show.summary  ? show.summary.replace(/<[^>]+>/g,'') : '',
-    network:  (show.network && show.network.name) || (show.webChannel && show.webChannel.name) || '',
-    status:   show.status   || '',
+    genres: show.genres || [],
+    rating: show.rating && show.rating.average ? show.rating.average : null,
+    overview: show.summary ? show.summary.replace(/<[^>]+>/g,'') : '',
+    network: (show.network && show.network.name) || (show.webChannel && show.webChannel.name) || '',
+    status: show.status || '',
     language: show.language || '',
-    runtime:  show.averageRuntime ? show.averageRuntime + ' min/ep' : '',
+    runtime: show.averageRuntime ? show.averageRuntime + ' min/ep' : '',
     raw: show
   };
+}
+
+function getGradient(genres) {
+  if (!genres || !genres.length) return GENRE_GRAD.default;
+  return GENRE_GRAD[(genres[0]||'').toLowerCase()] || GENRE_GRAD.default;
+}
+function getEmoji(genres) {
+  if (!genres || !genres.length) return '🎬';
+  return GENRE_EMOJI[(genres[0]||'').toLowerCase()] || '🎬';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -720,27 +778,68 @@ function normTV(show) {
 async function fetchContent(append) {
   if (S.loading) return;
   if (!append) {
-    S.items          = [];
-    S.tvRawShows     = [];
+    S.items = [];
+    S.traktPage = 1;
+    S.tvRawShows = [];
     S.tvDisplayStart = 0;
-    S.tvMazePage     = 0;
-    S.tvExhausted    = false;
+    S.tvMazePage = 0;
+    S.tvExhausted = false;
     document.getElementById('media-grid').innerHTML = '';
     document.getElementById('load-more-wrap').style.display = 'none';
   }
-  await fetchShows(append);
+  if (S.tab === 'tv') {
+    await fetchTV(append);
+  } else {
+    await fetchMovies(append);
+  }
 }
 
-async function fetchShows(append) {
+// ── Movies / Docs (Trakt) ───────────────────────────────────────────────────
+async function fetchMovies(append) {
   S.loading = true;
   if (!append) showSkeleton();
   updateLoadMoreBtn(true);
 
-  // ── Search ──
+  try {
+    var items;
+    if (S.search) {
+      var results = await trakt('search/movie', { query: S.search, extended: 'full', limit: 20 });
+      items = (results||[]).map(function(r){ return normTrakt(r.movie||r); });
+      document.getElementById('load-more-wrap').style.display = 'none';
+    } else {
+      var isDoc = S.tab === 'docs';
+      var genreParam = isDoc ? 'documentary'
+        : (S.genre !== 'all' ? S.genre
+        : (S.mood  !== 'all' ? (MOOD_TRAKT[S.mood]||null) : null));
+      var params = { extended: 'full', page: S.traktPage, limit: 20 };
+      if (genreParam) params.genres = genreParam;
+      var endpoint = S.sortMode === 'trending' ? 'movies/trending' : 'movies/popular';
+      var data = await trakt(endpoint, params);
+      items = (data||[]).map(function(r){ return normTrakt(S.sortMode==='trending' ? r.movie : r); });
+      S.traktPage++;
+      document.getElementById('load-more-wrap').style.display = items.length >= 20 ? '' : 'none';
+    }
+    items.forEach(function(i){ detailCache[i.id] = i; });
+    if (append) { S.items = S.items.concat(items); appendCards(items); }
+    else        { S.items = items; renderCards(items); }
+    updateResultsHeader();
+  } catch(e) {
+    if (!append) showError(e.message);
+  }
+  S.loading = false;
+  updateLoadMoreBtn(false);
+}
+
+// ── TV Shows (TVmaze) ───────────────────────────────────────────────────────
+async function fetchTV(append) {
+  S.loading = true;
+  if (!append) showSkeleton();
+  updateLoadMoreBtn(true);
+
   if (S.search) {
     try {
-      const results = await tvmaze('search/shows', { q: S.search });
-      const items   = (results || []).map(function(r){ return normTV(r.show); });
+      var results = await tvmaze('search/shows', { q: S.search });
+      var items = (results||[]).map(function(r){ return normTV(r.show); });
       items.forEach(function(i){ detailCache[i.id] = i; });
       S.items = items;
       renderCards(items);
@@ -752,25 +851,21 @@ async function fetchShows(append) {
     return;
   }
 
-  // ── Browse: keep fetching TVmaze pages until we have a full batch ──
-  const BATCH = 20;
-  var filtered = filterShows(S.tvRawShows);
+  var BATCH = 20;
+  var filtered = filterTV(S.tvRawShows);
   var toShow   = filtered.slice(S.tvDisplayStart, S.tvDisplayStart + BATCH);
 
   while (toShow.length < BATCH && !S.tvExhausted) {
     try {
-      const raw = await tvmaze('shows', { page: S.tvMazePage });
+      var raw = await tvmaze('shows', { page: S.tvMazePage });
       S.tvMazePage++;
       S.tvRawShows = S.tvRawShows.concat(raw);
-      filtered = filterShows(S.tvRawShows);
+      filtered = filterTV(S.tvRawShows);
       toShow   = filtered.slice(S.tvDisplayStart, S.tvDisplayStart + BATCH);
-    } catch(e) {
-      S.tvExhausted = true;
-      break;
-    }
+    } catch(e) { S.tvExhausted = true; break; }
   }
 
-  const normalised = toShow.map(normTV);
+  var normalised = toShow.map(normTV);
   S.tvDisplayStart += normalised.length;
   normalised.forEach(function(i){ detailCache[i.id] = i; });
 
@@ -778,32 +873,20 @@ async function fetchShows(append) {
   else        { S.items = normalised; renderCards(normalised); }
   updateResultsHeader();
 
-  const hasMore = filterShows(S.tvRawShows).length > S.tvDisplayStart || !S.tvExhausted;
+  var hasMore = filterTV(S.tvRawShows).length > S.tvDisplayStart || !S.tvExhausted;
   document.getElementById('load-more-wrap').style.display = (hasMore && normalised.length > 0) ? '' : 'none';
   S.loading = false;
   updateLoadMoreBtn(false);
 }
 
-function filterShows(shows) {
+function filterTV(shows) {
   return shows.filter(function(show) {
-    const genres = show.genres || [];
-
-    // Docs tab — must belong to a documentary-style genre
-    if (S.tab === 'docs') {
-      if (!genres.some(function(g){ return DOC_GENRES.includes(g); })) return false;
+    var genres = show.genres || [];
+    if (S.genre !== 'all' && !genres.includes(S.genre)) return false;
+    if (S.mood  !== 'all') {
+      var mg = MOOD_TV[S.mood];
+      if (mg && !genres.some(function(g){ return g.toLowerCase()===mg.toLowerCase(); })) return false;
     }
-
-    // Genre pill filter (TV Shows tab only)
-    if (S.tab === 'tv' && S.genre !== 'all') {
-      if (!genres.includes(S.genre)) return false;
-    }
-
-    // Mood filter
-    if (S.mood !== 'all') {
-      const mg = MOOD_TV_GENRE[S.mood];
-      if (mg && !genres.some(function(g){ return g.toLowerCase() === mg.toLowerCase(); })) return false;
-    }
-
     return true;
   });
 }
@@ -812,46 +895,50 @@ function filterShows(shows) {
 // CARDS
 // ═══════════════════════════════════════════════════════════════════════════
 function cardHTML(item) {
-  const inWL = S.watchlist.includes(item.id);
-  const inWD = S.watched.includes(item.id);
-  const genreTags = (item.genres || []).slice(0,2).map(function(g){
+  var inWL = S.watchlist.includes(item.id);
+  var inWD = S.watched.includes(item.id);
+  var genreTags = (item.genres||[]).slice(0,2).map(function(g){
     return '<span class="game-tag">'+esc(g)+'</span>';
   }).join('');
-  const ratingBadge = item.rating
-    ? '<div class="card-rating">&#9733; '+item.rating+'</div>' : '';
+  var ratingBadge = item.rating ? '<div class="card-rating">&#9733; '+item.rating+'</div>' : '';
 
-  const posterContent = item.poster
-    ? '<img class="card-img-tag" src="'+item.poster+'" alt="'+esc(item.title)+'"'
-      +' loading="lazy" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">'
-    : '<span style="font-size:2.5rem">📺</span>';
+  var posterContent;
+  if (item.source === 'tv' && item.poster) {
+    posterContent = '<img class="card-img-tag" src="'+item.poster+'" alt="'+esc(item.title)+'"'
+      +' loading="lazy" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">';
+  } else {
+    var grad  = getGradient(item.genres);
+    var emoji = getEmoji(item.genres);
+    posterContent = '<div style="position:absolute;inset:0;background:'+grad+';display:flex;'
+      +'flex-direction:column;align-items:center;justify-content:center">'
+      +'<span style="font-size:2.2rem">'+emoji+'</span></div>';
+  }
 
-  const metaParts = [];
-  if (item.year)    metaParts.push('<span>'+esc(item.year)+'</span>');
+  var metaParts = [];
+  if (item.year)    metaParts.push('<span>'+esc(String(item.year))+'</span>');
+  if (item.runtime) metaParts.push('<span class="meta-dot">·</span><span>'+esc(item.runtime)+'</span>');
   if (item.network) metaParts.push('<span class="meta-dot">·</span><span>'+esc(item.network)+'</span>');
-  if (item.status === 'Running')
+  if (item.source==='tv' && item.status==='Running')
     metaParts.push('<span class="meta-dot">·</span><span style="color:#4caf50">● Live</span>');
 
   return '<div class="game-card" data-id="'+item.id+'" onclick="openModal(\''+item.id+'\')">'
-    +'<div class="game-card-img">'
-    +posterContent
-    +ratingBadge
+    +'<div class="game-card-img" style="position:relative">'
+    +posterContent+ratingBadge
     +'<div class="card-actions" onclick="event.stopPropagation()">'
     +'<button class="card-action-btn btn-fav'+(inWL?' active':'')+'" title="Watchlist"'
     +' onclick="toggleWatchlist(\''+item.id+'\',this)">🤍</button>'
     +'<button class="card-action-btn btn-played'+(inWD?' active':'')+'" title="Watched"'
     +' onclick="toggleWatched(\''+item.id+'\',this)">👁</button>'
-    +'</div>'
-    +'</div>'
+    +'</div></div>'
     +'<div class="game-card-body">'
     +'<div class="game-card-title">'+esc(item.title)+'</div>'
     +'<div class="game-card-meta">'+metaParts.join('')+'</div>'
     +(genreTags ? '<div class="game-card-tags">'+genreTags+'</div>' : '')
-    +'</div>'
-    +'</div>';
+    +'</div></div>';
 }
 
 function renderCards(items) {
-  const grid = document.getElementById('media-grid');
+  var grid = document.getElementById('media-grid');
   if (!items.length) {
     grid.innerHTML = '';
     document.getElementById('empty-state').style.display = '';
@@ -867,15 +954,15 @@ function appendCards(items) {
   if (!items.length) return;
   document.getElementById('empty-state').style.display = 'none';
   document.getElementById('results-area').style.display = '';
-  const frag = document.createElement('div');
+  var frag = document.createElement('div');
   frag.innerHTML = items.map(cardHTML).join('');
-  const grid = document.getElementById('media-grid');
+  var grid = document.getElementById('media-grid');
   while (frag.firstChild) grid.appendChild(frag.firstChild);
   wireCardActions();
 }
 function showSkeleton() {
-  let html = '';
-  for (let i=0;i<12;i++) {
+  var html = '';
+  for (var i=0;i<12;i++) {
     html += '<div class="skeleton-card"><div class="skeleton-img"></div>'
       +'<div style="padding:.8rem">'
       +'<div class="skeleton-line" style="height:14px;width:80%;margin-bottom:.4rem"></div>'
@@ -889,10 +976,11 @@ function showError(msg) {
     '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:rgba(200,180,255,.6)">'
     +'<div style="font-size:2.5rem;margin-bottom:.75rem">⚠️</div>'
     +'<p style="font-weight:600;margin-bottom:.4rem">'+esc(msg)+'</p>'
+    +'<p style="font-size:.8rem;opacity:.6">Check your TRAKT_CLIENT_ID is set in Vercel environment variables.</p>'
     +'</div>';
 }
 function esc(s) {
-  if (s === null || s === undefined) return '';
+  if (s===null||s===undefined) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
@@ -901,34 +989,38 @@ function esc(s) {
 // ═══════════════════════════════════════════════════════════════════════════
 async function openModal(id) {
   S.modalId = id;
-  const overlay = document.getElementById('media-modal');
+  var overlay = document.getElementById('media-modal');
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Reset
   document.getElementById('modal-title').textContent = 'Loading…';
   document.getElementById('modal-hero-img').style.display = 'none';
   document.getElementById('modal-hero').style.background = '';
-  const existingEmoji = document.getElementById('modal-hero').querySelector('.modal-hero-emoji');
-  if (existingEmoji) existingEmoji.remove();
-  document.getElementById('modal-meta').innerHTML    = '';
-  document.getElementById('modal-tags').innerHTML    = '';
+  var ex = document.getElementById('modal-hero').querySelector('.modal-hero-emoji');
+  if (ex) ex.remove();
+  document.getElementById('modal-meta').innerHTML = '';
+  document.getElementById('modal-tags').innerHTML = '';
   document.getElementById('modal-overview').textContent = '';
-  document.getElementById('modal-stats').innerHTML   = '';
+  document.getElementById('modal-stats').innerHTML = '';
   document.getElementById('trailer-container').innerHTML = '';
-  document.getElementById('similar-grid').innerHTML  = '';
-  document.getElementById('watch-providers').innerHTML  = '';
+  document.getElementById('similar-grid').innerHTML = '';
+  document.getElementById('watch-providers').innerHTML = '';
   document.getElementById('modal-cert-badge').style.display = 'none';
-  setModalTabLabel('trailer','Episodes');
-  setModalTabLabel('similar','Cast');
   switchModalTab('overview');
 
-  await openTVModal(id);
+  if (id.startsWith('tv_')) {
+    setModalTabLabel('trailer','Episodes');
+    setModalTabLabel('similar','Cast');
+    await openTVModal(id);
+  } else {
+    setModalTabLabel('trailer','Trailer');
+    setModalTabLabel('similar','Similar');
+    await openMovieModal(id);
+  }
   wireModalActions(id);
 }
-
 function setModalTabLabel(tabKey, label) {
-  const btn = document.querySelector('.modal-tab[data-mtab="'+tabKey+'"]');
+  var btn = document.querySelector('.modal-tab[data-mtab="'+tabKey+'"]');
   if (btn) btn.textContent = label;
 }
 function closeModal() {
@@ -938,180 +1030,220 @@ function closeModal() {
 }
 function switchModalTab(tab) {
   document.querySelectorAll('.modal-tab').forEach(function(t){
-    t.classList.toggle('active', t.dataset.mtab === tab);
+    t.classList.toggle('active', t.dataset.mtab===tab);
   });
   document.querySelectorAll('.tab-panel').forEach(function(p){
-    p.classList.toggle('active', p.id === 'mtab-'+tab);
+    p.classList.toggle('active', p.id==='mtab-'+tab);
   });
 }
 
+// ── TV Modal ────────────────────────────────────────────────────────────────
 async function openTVModal(id) {
-  const tvId = id.replace('tv_','');
-  let item   = detailCache[id];
-
+  var tvId = id.replace('tv_','');
+  var item = detailCache[id];
   if (!item) {
-    try {
-      const show = await tvmaze('shows/'+tvId);
-      item = normTV(show);
-      detailCache[id] = item;
-    } catch(e) {
-      document.getElementById('modal-title').textContent = 'Failed to load';
-      return;
-    }
+    try { var show = await tvmaze('shows/'+tvId); item = normTV(show); detailCache[id]=item; }
+    catch(e) { document.getElementById('modal-title').textContent='Failed to load'; return; }
   }
-
   renderTVHeader(item);
   renderTVOverview(item);
-  renderWatchSection(item.title);
-
-  // Episodes + Cast in parallel
+  renderWatchSection(item.title,'tv');
   try {
-    const res = await Promise.allSettled([
+    var res = await Promise.allSettled([
       tvmaze('shows/'+tvId+'/episodes'),
       tvmaze('shows/'+tvId+'/cast')
     ]);
-    renderEpisodes(res[0].status === 'fulfilled' ? res[0].value : []);
-    renderCast(res[1].status === 'fulfilled'     ? res[1].value : []);
-  } catch(e) {
-    renderEpisodes([]);
-    renderCast([]);
-  }
+    renderEpisodes(res[0].status==='fulfilled' ? res[0].value : []);
+    renderCast(res[1].status==='fulfilled'     ? res[1].value : []);
+  } catch(e) { renderEpisodes([]); renderCast([]); }
 }
 
 function renderTVHeader(item) {
   document.getElementById('modal-title').textContent = item.title;
-  document.getElementById('modal-type-badge').textContent = S.tab === 'docs' ? 'Documentary' : 'TV Show';
-
-  const rb = document.getElementById('modal-rating-badge');
-  if (item.rating) { rb.textContent = '⭐ '+item.rating; rb.style.display = ''; }
-  else rb.style.display = 'none';
-
-  if (item.backdrop || item.poster) {
-    const img = document.getElementById('modal-hero-img');
-    img.src   = item.backdrop || item.poster;
-    img.style.display = '';
+  document.getElementById('modal-type-badge').textContent = 'TV Show';
+  var rb = document.getElementById('modal-rating-badge');
+  if (item.rating) { rb.textContent='⭐ '+item.rating; rb.style.display=''; } else rb.style.display='none';
+  if (item.backdrop||item.poster) {
+    var img=document.getElementById('modal-hero-img'); img.src=item.backdrop||item.poster; img.style.display='';
   }
-
-  const chips = [];
+  var chips=[];
   if (item.year)    chips.push('<span class="modal-meta-chip">📅 '+esc(item.year)+'</span>');
   if (item.network) chips.push('<span class="modal-meta-chip">📺 '+esc(item.network)+'</span>');
   if (item.status)  chips.push('<span class="modal-meta-chip">'+(item.status==='Running'?'🟢':'⬜')+' '+esc(item.status)+'</span>');
   if (item.runtime) chips.push('<span class="modal-meta-chip">⏱ '+esc(item.runtime)+'</span>');
-  document.getElementById('modal-meta').innerHTML = chips.join('');
-  document.getElementById('modal-tags').innerHTML = (item.genres||[]).map(function(g){
+  document.getElementById('modal-meta').innerHTML=chips.join('');
+  document.getElementById('modal-tags').innerHTML=(item.genres||[]).map(function(g){
     return '<span class="modal-tag">'+esc(g)+'</span>';
   }).join('');
 }
-
 function renderTVOverview(item) {
-  document.getElementById('modal-overview').textContent = item.overview || 'No overview available.';
-  const stats = [];
-  if (item.year)     stats.push(['Premiere', item.year]);
-  if (item.network)  stats.push(['Network',  item.network]);
-  if (item.status)   stats.push(['Status',   item.status]);
-  if (item.language) stats.push(['Language', item.language]);
-  if (item.runtime)  stats.push(['Runtime',  item.runtime]);
-  document.getElementById('modal-stats').innerHTML = stats.map(function(s){
+  document.getElementById('modal-overview').textContent = item.overview||'No overview available.';
+  var stats=[];
+  if (item.year)     stats.push(['Premiere',item.year]);
+  if (item.network)  stats.push(['Network', item.network]);
+  if (item.status)   stats.push(['Status',  item.status]);
+  if (item.language) stats.push(['Language',item.language]);
+  if (item.runtime)  stats.push(['Runtime', item.runtime]);
+  document.getElementById('modal-stats').innerHTML=stats.map(function(s){
     return '<div class="overview-stat"><div class="overview-stat-label">'+s[0]+'</div>'
       +'<div class="overview-stat-val">'+esc(s[1])+'</div></div>';
   }).join('');
 }
-
 function renderEpisodes(episodes) {
-  const container = document.getElementById('trailer-container');
-  if (!episodes || !episodes.length) {
-    container.innerHTML = '<div class="trailer-placeholder">No episode data available.</div>';
-    return;
-  }
-  // Group by season
-  const seasons = {};
-  episodes.forEach(function(ep) {
-    if (!seasons[ep.season]) seasons[ep.season] = [];
-    seasons[ep.season].push(ep);
-  });
-  const html = Object.keys(seasons).map(function(sn) {
-    const eps = seasons[sn];
-    const rows = eps.map(function(ep) {
-      let summary = ep.summary ? ep.summary.replace(/<[^>]+>/g,'') : '';
-      if (summary.length > 130) summary = summary.slice(0,130)+'…';
+  var container=document.getElementById('trailer-container');
+  if (!episodes||!episodes.length) { container.innerHTML='<div class="trailer-placeholder">No episode data available.</div>'; return; }
+  var seasons={};
+  episodes.forEach(function(ep){ if(!seasons[ep.season]) seasons[ep.season]=[]; seasons[ep.season].push(ep); });
+  var html=Object.keys(seasons).map(function(sn){
+    var eps=seasons[sn];
+    var rows=eps.map(function(ep){
+      var summary=ep.summary?ep.summary.replace(/<[^>]+>/g,''):'';
+      if(summary.length>130) summary=summary.slice(0,130)+'…';
       return '<div style="padding:.5rem 1rem;border-bottom:1px solid rgba(120,60,200,0.1);display:flex;gap:.75rem;align-items:flex-start">'
         +'<span style="font-size:.68rem;color:rgba(200,180,255,.35);min-width:2.4rem;padding-top:.1rem">E'+ep.number+'</span>'
         +'<div style="flex:1;min-width:0">'
         +'<div style="font-size:.82rem;font-weight:600;color:#f0ebff">'+esc(ep.name)+'</div>'
-        +(ep.airdate ? '<div style="font-size:.67rem;color:rgba(200,180,255,.35);margin-top:.1rem">'+ep.airdate+'</div>' : '')
-        +(summary    ? '<div style="font-size:.76rem;color:rgba(220,200,255,.5);margin-top:.3rem;line-height:1.5">'+esc(summary)+'</div>' : '')
+        +(ep.airdate?'<div style="font-size:.67rem;color:rgba(200,180,255,.35);margin-top:.1rem">'+ep.airdate+'</div>':'')
+        +(summary?'<div style="font-size:.76rem;color:rgba(220,200,255,.5);margin-top:.3rem;line-height:1.5">'+esc(summary)+'</div>':'')
         +'</div>'
-        +(ep.rating && ep.rating.average ? '<span style="font-size:.67rem;color:#c8a0ff;flex-shrink:0;padding-top:.1rem">⭐ '+ep.rating.average+'</span>' : '')
+        +(ep.rating&&ep.rating.average?'<span style="font-size:.67rem;color:#c8a0ff;flex-shrink:0;padding-top:.1rem">⭐ '+ep.rating.average+'</span>':'')
         +'</div>';
     }).join('');
     return '<details style="border:1px solid rgba(120,60,200,0.25);border-radius:8px;margin-bottom:.5rem;overflow:hidden">'
-      +'<summary style="padding:.75rem 1rem;cursor:pointer;font-weight:600;font-size:.88rem;'
-      +'background:rgba(120,60,200,0.1);list-style:none;display:flex;align-items:center;justify-content:space-between">'
-      +'<span>Season '+sn+'</span>'
-      +'<span style="font-size:.72rem;color:rgba(200,180,255,.45)">'+eps.length+' episodes ▼</span>'
-      +'</summary>'
-      +'<div style="padding:.4rem 0">'+rows+'</div>'
-      +'</details>';
+      +'<summary style="padding:.75rem 1rem;cursor:pointer;font-weight:600;font-size:.88rem;background:rgba(120,60,200,0.1);list-style:none;display:flex;align-items:center;justify-content:space-between">'
+      +'<span>Season '+sn+'</span><span style="font-size:.72rem;color:rgba(200,180,255,.45)">'+eps.length+' episodes ▼</span>'
+      +'</summary><div style="padding:.4rem 0">'+rows+'</div></details>';
   }).join('');
-  container.innerHTML = '<div style="max-height:460px;overflow-y:auto;padding-right:.2rem">'+html+'</div>';
+  container.innerHTML='<div style="max-height:460px;overflow-y:auto;padding-right:.2rem">'+html+'</div>';
 }
-
 function renderCast(cast) {
-  const container = document.getElementById('similar-grid');
-  if (!cast || !cast.length) {
-    container.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:rgba(200,180,255,.5);padding:2rem">No cast info available.</p>';
-    return;
-  }
-  container.innerHTML = cast.slice(0,12).map(function(m) {
-    const p  = m.person;
-    const ch = m.character;
-    const img = p && p.image && p.image.medium ? p.image.medium : null;
+  var container=document.getElementById('similar-grid');
+  if (!cast||!cast.length) { container.innerHTML='<p style="grid-column:1/-1;text-align:center;color:rgba(200,180,255,.5);padding:2rem">No cast info available.</p>'; return; }
+  container.innerHTML=cast.slice(0,12).map(function(m){
+    var p=m.person, ch=m.character;
+    var img=p&&p.image&&p.image.medium?p.image.medium:null;
     return '<div class="similar-card" style="cursor:default">'
-      +'<div class="similar-poster">'
-      +(img ? '<img src="'+img+'" alt="'+esc(p&&p.name)+'" loading="lazy" onload="this.classList.add(\'loaded\')">' : '👤')
-      +'</div>'
-      +'<div class="similar-body">'
-      +'<div class="similar-title">'+esc(p&&p.name)+'</div>'
-      +'<div class="similar-meta">'+esc(ch&&ch.name)+'</div>'
-      +'</div></div>';
+      +'<div class="similar-poster">'+(img?'<img src="'+img+'" alt="'+esc(p&&p.name)+'" loading="lazy" onload="this.classList.add(\'loaded\')">':'👤')+'</div>'
+      +'<div class="similar-body"><div class="similar-title">'+esc(p&&p.name)+'</div>'
+      +'<div class="similar-meta">'+esc(ch&&ch.name)+'</div></div></div>';
   }).join('');
 }
 
-function renderWatchSection(title) {
-  const q = encodeURIComponent(title + ' TV series');
-  document.getElementById('watch-providers').innerHTML =
+// ── Movie Modal (Trakt) ──────────────────────────────────────────────────────
+async function openMovieModal(id) {
+  var item = detailCache[id];
+  if (!item||!item.overview) {
+    try {
+      if (item&&item.traktSlug) {
+        var data = await trakt('movies/'+item.traktSlug, { extended:'full' });
+        item = normTrakt(data); detailCache[id]=item;
+      }
+    } catch(e) {}
+  }
+  if (!item) { document.getElementById('modal-title').textContent='Failed to load'; return; }
+
+  renderMovieHeader(item);
+  renderMovieOverview(item);
+  renderMovieTrailer(item);
+  renderWatchSection(item.title,'movie');
+  renderMovieSimilar(item);
+}
+function renderMovieHeader(item) {
+  var grad=getGradient(item.genres), emoji=getEmoji(item.genres);
+  var hero=document.getElementById('modal-hero');
+  hero.style.background=grad;
+  var emojiEl=document.createElement('div');
+  emojiEl.className='modal-hero-emoji';
+  emojiEl.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:4rem;opacity:.2;pointer-events:none';
+  emojiEl.textContent=emoji;
+  hero.insertBefore(emojiEl,hero.firstChild);
+
+  document.getElementById('modal-title').textContent=item.title;
+  document.getElementById('modal-type-badge').textContent=S.tab==='docs'?'Documentary':'Movie';
+  var rb=document.getElementById('modal-rating-badge');
+  if (item.rating){rb.textContent='⭐ '+item.rating;rb.style.display='';}else rb.style.display='none';
+  var cb=document.getElementById('modal-cert-badge');
+  if (item.certification){cb.textContent=item.certification;cb.style.display='';}else cb.style.display='none';
+  var chips=[];
+  if (item.year)          chips.push('<span class="modal-meta-chip">📅 '+esc(String(item.year))+'</span>');
+  if (item.runtime)       chips.push('<span class="modal-meta-chip">⏱ '+esc(item.runtime)+'</span>');
+  if (item.certification) chips.push('<span class="modal-meta-chip">🔞 '+esc(item.certification)+'</span>');
+  if (item.rating)        chips.push('<span class="modal-meta-chip">⭐ '+item.rating+' Trakt</span>');
+  document.getElementById('modal-meta').innerHTML=chips.join('');
+  document.getElementById('modal-tags').innerHTML=(item.genres||[]).map(function(g){
+    return '<span class="modal-tag">'+esc(g)+'</span>';
+  }).join('');
+}
+function renderMovieOverview(item) {
+  document.getElementById('modal-overview').textContent=item.overview||'No overview available.';
+  var m=item.raw||{}, stats=[];
+  if (item.year)          stats.push(['Year',    String(item.year)]);
+  if (item.runtime)       stats.push(['Runtime', item.runtime]);
+  if (m.released)         stats.push(['Released',m.released]);
+  if (item.certification) stats.push(['Rated',   item.certification]);
+  if (m.votes)            stats.push(['Votes',   m.votes.toLocaleString()]);
+  document.getElementById('modal-stats').innerHTML=stats.map(function(s){
+    return '<div class="overview-stat"><div class="overview-stat-label">'+s[0]+'</div>'
+      +'<div class="overview-stat-val">'+esc(s[1])+'</div></div>';
+  }).join('');
+}
+function renderMovieTrailer(item) {
+  var container=document.getElementById('trailer-container');
+  if (item.trailer) {
+    var m=item.trailer.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (m) { container.innerHTML='<div class="trailer-embed"><iframe src="https://www.youtube.com/embed/'+m[1]+'" allowfullscreen loading="lazy"></iframe></div>'; return; }
+  }
+  var q=encodeURIComponent((item.title||'')+' '+(item.year||'')+' official trailer');
+  container.innerHTML='<div class="trailer-placeholder" style="cursor:pointer" onclick="window.open(\'https://www.youtube.com/results?search_query='+q+'\',\'_blank\')">'
+    +'<div style="font-size:3.5rem">▶️</div>'
+    +'<div style="font-size:.95rem;font-weight:600;color:rgba(200,180,255,.8)">Watch Trailer on YouTube</div>'
+    +'<div style="font-size:.78rem;color:rgba(200,180,255,.45);margin-top:.2rem">'+esc(item.title)+' ('+esc(String(item.year))+')</div>'
+    +'</div>';
+}
+async function renderMovieSimilar(item) {
+  var grid=document.getElementById('similar-grid');
+  if (!item.traktSlug) { grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:rgba(200,180,255,.5);padding:2rem">No related titles found.</p>'; return; }
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:1.5rem;color:rgba(200,180,255,.4);font-size:.85rem">Loading…</div>';
+  try {
+    var results=await trakt('movies/'+item.traktSlug+'/related',{extended:'full',limit:8});
+    var items=(results||[]).slice(0,8).map(normTrakt);
+    if (!items.length) { grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:rgba(200,180,255,.5);padding:2rem">No related titles found.</p>'; return; }
+    items.forEach(function(i){ detailCache[i.id]=i; });
+    grid.innerHTML=items.map(function(r){
+      return '<div class="similar-card" onclick="openModal(\''+r.id+'\')">'
+        +'<div class="similar-poster" style="background:'+getGradient(r.genres)+'"><span style="font-size:1.8rem">'+getEmoji(r.genres)+'</span></div>'
+        +'<div class="similar-body"><div class="similar-title">'+esc(r.title)+'</div><div class="similar-meta">'+esc(String(r.year))+'</div></div></div>';
+    }).join('');
+  } catch(e) { grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:rgba(200,180,255,.5);padding:2rem">Could not load related titles.</p>'; }
+}
+
+function renderWatchSection(title, type) {
+  var q=encodeURIComponent(title+(type==='tv'?' TV series':' film'));
+  document.getElementById('watch-providers').innerHTML=
     '<div class="watch-unavailable">Streaming availability varies by region.</div>'
     +'<div style="display:flex;flex-direction:column;gap:.75rem;margin-top:1rem">'
-    +'<a href="https://www.justwatch.com/us/search?q='+q+'" target="_blank" rel="noopener"'
-    +' class="modal-action-btn" style="text-decoration:none;justify-content:center">🎯 Find on JustWatch — every streaming option</a>'
-    +'<a href="https://www.google.com/search?q=where+to+watch+'+q+'" target="_blank" rel="noopener"'
-    +' class="modal-action-btn" style="text-decoration:none;justify-content:center">🔍 Google: Where to watch</a>'
+    +'<a href="https://www.justwatch.com/us/search?q='+q+'" target="_blank" rel="noopener" class="modal-action-btn" style="text-decoration:none;justify-content:center">🎯 Find on JustWatch — every streaming option</a>'
+    +'<a href="https://www.google.com/search?q=where+to+watch+'+q+'" target="_blank" rel="noopener" class="modal-action-btn" style="text-decoration:none;justify-content:center">🔍 Google: Where to watch</a>'
     +'</div>';
 }
 
 function wireModalActions(id) {
-  const wlBtn = document.getElementById('modal-wl-btn');
-  const wdBtn = document.getElementById('modal-wd-btn');
+  var wlBtn=document.getElementById('modal-wl-btn');
+  var wdBtn=document.getElementById('modal-wd-btn');
   function refresh() {
-    const inWL = S.watchlist.includes(id);
-    const inWD = S.watched.includes(id);
-    wlBtn.classList.toggle('wl-active', inWL);
-    wlBtn.textContent = inWL ? '❤️ Saved' : '🤍 Watchlist';
-    wdBtn.classList.toggle('wd-active', inWD);
-    wdBtn.textContent = inWD ? '✅ Watched' : '👁 Watched';
+    var inWL=S.watchlist.includes(id), inWD=S.watched.includes(id);
+    wlBtn.classList.toggle('wl-active',inWL); wlBtn.textContent=inWL?'❤️ Saved':'🤍 Watchlist';
+    wdBtn.classList.toggle('wd-active',inWD); wdBtn.textContent=inWD?'✅ Watched':'👁 Watched';
   }
   refresh();
-  wlBtn.onclick = function(){ toggleWatchlistById(id); refresh(); };
-  wdBtn.onclick = function(){ toggleWatchedById(id);   refresh(); };
-  document.querySelectorAll('.rate-btn').forEach(function(btn) {
-    btn.classList.toggle('active', S.ratings[id] === btn.dataset.r);
-    btn.onclick = function() {
-      if (S.ratings[id] === btn.dataset.r) delete S.ratings[id];
-      else S.ratings[id] = btn.dataset.r;
-      saveLS('ratings', S.ratings);
-      document.querySelectorAll('.rate-btn').forEach(function(b){
-        b.classList.toggle('active', S.ratings[id] === b.dataset.r);
-      });
+  wlBtn.onclick=function(){ toggleWatchlistById(id); refresh(); };
+  wdBtn.onclick=function(){ toggleWatchedById(id);   refresh(); };
+  document.querySelectorAll('.rate-btn').forEach(function(btn){
+    btn.classList.toggle('active',S.ratings[id]===btn.dataset.r);
+    btn.onclick=function(){
+      if(S.ratings[id]===btn.dataset.r) delete S.ratings[id]; else S.ratings[id]=btn.dataset.r;
+      saveLS('ratings',S.ratings);
+      document.querySelectorAll('.rate-btn').forEach(function(b){ b.classList.toggle('active',S.ratings[id]===b.dataset.r); });
     };
   });
 }
@@ -1119,48 +1251,45 @@ function wireModalActions(id) {
 // ═══════════════════════════════════════════════════════════════════════════
 // WATCHLIST / WATCHED
 // ═══════════════════════════════════════════════════════════════════════════
-function toggleWatchlist(id, btn) {
-  const idx = S.watchlist.indexOf(id);
-  if (idx === -1) { S.watchlist.push(id); if(btn) btn.classList.add('active'); }
-  else            { S.watchlist.splice(idx,1); if(btn) btn.classList.remove('active'); }
-  saveLS('watchlist', S.watchlist);
-  if (S.tab === 'mylist') renderMyList();
+function toggleWatchlist(id,btn) {
+  var idx=S.watchlist.indexOf(id);
+  if(idx===-1){S.watchlist.push(id);if(btn)btn.classList.add('active');}
+  else{S.watchlist.splice(idx,1);if(btn)btn.classList.remove('active');}
+  saveLS('watchlist',S.watchlist);
+  if(S.tab==='mylist') renderMyList();
 }
-function toggleWatched(id, btn) {
-  const idx = S.watched.indexOf(id);
-  if (idx === -1) { S.watched.push(id); if(btn) btn.classList.add('active'); }
-  else            { S.watched.splice(idx,1); if(btn) btn.classList.remove('active'); }
-  saveLS('watched', S.watched);
-  if (S.tab === 'mylist') renderMyList();
+function toggleWatched(id,btn) {
+  var idx=S.watched.indexOf(id);
+  if(idx===-1){S.watched.push(id);if(btn)btn.classList.add('active');}
+  else{S.watched.splice(idx,1);if(btn)btn.classList.remove('active');}
+  saveLS('watched',S.watched);
+  if(S.tab==='mylist') renderMyList();
 }
-function toggleWatchlistById(id) { toggleWatchlist(id,null); syncCardBtn(id,'fav',   S.watchlist.includes(id)); }
-function toggleWatchedById(id)   { toggleWatched(id,null);   syncCardBtn(id,'played',S.watched.includes(id));  }
-function syncCardBtn(id, type, active) {
-  const card = document.querySelector('.game-card[data-id="'+id+'"]');
-  if (!card) return;
-  const btn = card.querySelector('.btn-'+type);
-  if (btn) btn.classList.toggle('active', active);
+function toggleWatchlistById(id){ toggleWatchlist(id,null); syncCardBtn(id,'fav',   S.watchlist.includes(id)); }
+function toggleWatchedById(id)  { toggleWatched(id,null);   syncCardBtn(id,'played',S.watched.includes(id));  }
+function syncCardBtn(id,type,active) {
+  var card=document.querySelector('.game-card[data-id="'+id+'"]');
+  if(!card) return;
+  var btn=card.querySelector('.btn-'+type);
+  if(btn) btn.classList.toggle('active',active);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MY LIST
 // ═══════════════════════════════════════════════════════════════════════════
 function renderMyList() {
-  const allIds = Array.from(new Set(S.watchlist.concat(S.watched)));
-  document.getElementById('mylist-welcome').style.display = allIds.length === 0 ? '' : 'none';
-
-  const wlItems = S.watchlist.map(function(id){ return detailCache[id]; }).filter(Boolean);
-  document.getElementById('wl-count').textContent = S.watchlist.length ? '('+S.watchlist.length+')' : '';
-  const wlGrid = document.getElementById('wl-grid');
-  if (wlItems.length) { wlGrid.innerHTML = wlItems.map(cardHTML).join(''); document.getElementById('wl-empty').style.display='none'; }
-  else { wlGrid.innerHTML = ''; document.getElementById('wl-empty').style.display = ''; }
-
-  const wdItems = S.watched.map(function(id){ return detailCache[id]; }).filter(Boolean);
-  document.getElementById('wd-count').textContent = S.watched.length ? '('+S.watched.length+')' : '';
-  const wdGrid = document.getElementById('wd-grid');
-  if (wdItems.length) { wdGrid.innerHTML = wdItems.map(cardHTML).join(''); document.getElementById('wd-empty').style.display='none'; }
-  else { wdGrid.innerHTML = ''; document.getElementById('wd-empty').style.display = ''; }
-
+  var allIds=Array.from(new Set(S.watchlist.concat(S.watched)));
+  document.getElementById('mylist-welcome').style.display=allIds.length===0?'':'none';
+  var wlItems=S.watchlist.map(function(id){return detailCache[id];}).filter(Boolean);
+  document.getElementById('wl-count').textContent=S.watchlist.length?'('+S.watchlist.length+')':'';
+  var wlGrid=document.getElementById('wl-grid');
+  if(wlItems.length){wlGrid.innerHTML=wlItems.map(cardHTML).join('');document.getElementById('wl-empty').style.display='none';}
+  else{wlGrid.innerHTML='';document.getElementById('wl-empty').style.display='';}
+  var wdItems=S.watched.map(function(id){return detailCache[id];}).filter(Boolean);
+  document.getElementById('wd-count').textContent=S.watched.length?'('+S.watched.length+')':'';
+  var wdGrid=document.getElementById('wd-grid');
+  if(wdItems.length){wdGrid.innerHTML=wdItems.map(cardHTML).join('');document.getElementById('wd-empty').style.display='none';}
+  else{wdGrid.innerHTML='';document.getElementById('wd-empty').style.display='';}
   wireCardActions();
 }
 
@@ -1168,95 +1297,76 @@ function renderMyList() {
 // CAN'T DECIDE
 // ═══════════════════════════════════════════════════════════════════════════
 async function runDecide() {
-  const btn    = document.getElementById('decide-btn');
-  const result = document.getElementById('decide-result');
-  btn.textContent = 'Finding something perfect… ✨';
-  btn.disabled = true;
-  result.style.display = 'none';
-
+  var btn=document.getElementById('decide-btn');
+  var result=document.getElementById('decide-result');
+  btn.textContent='Finding something perfect… ✨';
+  btn.disabled=true;
+  result.style.display='none';
   try {
-    const mood  = S.decideMood;
-    const dtype = S.decideType;
-    const pg    = Math.floor(Math.random() * 8);
-    const shows = await tvmaze('shows', { page: pg });
-
-    let pool = shows;
-
-    // Filter docs
-    if (dtype === 'doc') {
-      const docFiltered = shows.filter(function(s){
-        return (s.genres||[]).some(function(g){ return DOC_GENRES.includes(g); });
-      });
-      if (docFiltered.length) pool = docFiltered;
+    var item, mood=S.decideMood, dtype=S.decideType;
+    if (dtype==='tv') {
+      var pg=Math.floor(Math.random()*8);
+      var shows=await tvmaze('shows',{page:pg});
+      var pool=shows;
+      if(mood!=='all'&&MOOD_TV[mood]){
+        var mg=MOOD_TV[mood];
+        var f=shows.filter(function(s){return(s.genres||[]).some(function(g){return g.toLowerCase()===mg.toLowerCase();});});
+        if(f.length) pool=f;
+      }
+      var rich=pool.filter(function(s){return s.image&&s.summary;});
+      if(rich.length) pool=rich;
+      item=normTV(pool[Math.floor(Math.random()*pool.length)]);
+    } else {
+      var genreParam=dtype==='doc'?'documentary':(mood!=='all'?(MOOD_TRAKT[mood]||null):null);
+      var params={extended:'full',page:Math.floor(Math.random()*5)+1,limit:20};
+      if(genreParam) params.genres=genreParam;
+      var data=await trakt('movies/popular',params);
+      var pool2=(data||[]).map(normTrakt).filter(function(i){return i.overview;});
+      if(!pool2.length) throw new Error('No results — try again!');
+      item=pool2[Math.floor(Math.random()*pool2.length)];
     }
-
-    // Filter by mood
-    if (mood !== 'all' && MOOD_TV_GENRE[mood]) {
-      const mg = MOOD_TV_GENRE[mood];
-      const moodFiltered = pool.filter(function(s){
-        return (s.genres||[]).some(function(g){ return g.toLowerCase() === mg.toLowerCase(); });
-      });
-      if (moodFiltered.length) pool = moodFiltered;
-    }
-
-    // Prefer shows with a poster + overview
-    const rich = pool.filter(function(s){ return s.image && s.summary; });
-    if (rich.length) pool = rich;
-
-    const raw  = pool[Math.floor(Math.random() * pool.length)];
-    const item = normTV(raw);
-    detailCache[item.id] = item;
-
-    const reason    = MOOD_REASONS[mood] || MOOD_REASONS['all'];
-    const posterSrc = item.backdrop || item.poster;
-
-    result.style.display = '';
-    result.innerHTML =
-      '<div class="decide-result-card">'
-      +'<div class="decide-result-backdrop">'
-      +(posterSrc ? '<img src="'+posterSrc+'" alt="'+esc(item.title)+'" onerror="this.remove()">'
-        : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:5rem;opacity:.3">📺</div>')
+    detailCache[item.id]=item;
+    var reason=MOOD_REASONS[mood]||MOOD_REASONS['all'];
+    var posterSrc=item.backdrop||item.poster;
+    var grad=getGradient(item.genres), emoji=getEmoji(item.genres);
+    result.style.display='';
+    result.innerHTML='<div class="decide-result-card">'
+      +'<div class="decide-result-backdrop" style="'+(posterSrc?'':'background:'+grad)+'">'
+      +(posterSrc?'<img src="'+posterSrc+'" alt="'+esc(item.title)+'" onerror="this.remove()">'
+        :'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:5rem;opacity:.3">'+emoji+'</div>')
       +'<div class="decide-result-backdrop-grad"></div>'
       +'</div>'
       +'<div class="decide-result-info">'
       +'<div class="decide-result-title">'+esc(item.title)+'</div>'
-      +'<div class="decide-result-meta">'+esc(item.year)
-      +(item.genres&&item.genres.length ? ' · '+item.genres.slice(0,2).join(', ') : '')
-      +(item.network ? ' · '+item.network : '')+'</div>'
+      +'<div class="decide-result-meta">'+esc(String(item.year))+(item.genres&&item.genres.length?' · '+item.genres.slice(0,2).join(', '):'')+(item.network?' · '+item.network:'')+'</div>'
       +'<div class="decide-result-reason">"'+esc(reason)+'"</div>'
       +'<div class="decide-result-actions">'
       +'<button class="btn-primary" onclick="openModal(\''+item.id+'\')">See details →</button>'
       +'<button class="btn-secondary" onclick="runDecide()">🎲 Try again</button>'
       +'</div></div></div>';
-
   } catch(e) {
-    result.style.display = '';
-    result.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(200,180,255,.6)">'+esc(e.message)+'<br><small>Try again in a moment.</small></div>';
+    result.style.display='';
+    result.innerHTML='<div style="text-align:center;padding:2rem;color:rgba(200,180,255,.6)">'+esc(e.message)+'</div>';
   }
-  btn.textContent = 'Find Something to Watch ✨';
-  btn.disabled = false;
+  btn.textContent='Find Something to Watch ✨';
+  btn.disabled=false;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GENRE PILLS
 // ═══════════════════════════════════════════════════════════════════════════
 function buildGenrePills() {
-  // Docs tab uses its own genre system — hide the genre row
-  const genreGroup = document.getElementById('genre-filter-group');
-  if (S.tab === 'docs') {
-    genreGroup.style.display = 'none';
-    return;
-  }
-  genreGroup.style.display = '';
-  const container = document.getElementById('genre-pills');
-  container.innerHTML = GENRE_PILLS_TV.map(function(p){
+  var genreGroup=document.getElementById('genre-filter-group');
+  if (S.tab==='docs') { genreGroup.style.display='none'; return; }
+  genreGroup.style.display='';
+  var pills=S.tab==='tv' ? GENRE_PILLS_TV : GENRE_PILLS_MOVIE;
+  var container=document.getElementById('genre-pills');
+  container.innerHTML=pills.map(function(p){
     return '<button class="pill '+(S.genre===p.id?'active':'')+'" data-genre="'+p.id+'">'+esc(p.label)+'</button>';
   }).join('');
   container.querySelectorAll('[data-genre]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      S.genre = btn.dataset.genre;
-      buildGenrePills();
-      fetchContent(false);
+    btn.addEventListener('click',function(){
+      S.genre=btn.dataset.genre; buildGenrePills(); fetchContent(false);
     });
   });
 }
@@ -1265,64 +1375,51 @@ function buildGenrePills() {
 // UI HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
 function updateResultsHeader() {
-  const titles = { tv:'TV Shows', docs:'Documentaries' };
-  document.getElementById('results-title').textContent =
-    S.search ? 'Results for "'+S.search+'"' : (titles[S.tab] || 'TV Shows');
-  document.getElementById('results-count').textContent =
-    S.items.length ? S.items.length+' titles' : '';
+  var titles={movies:'Movies',tv:'TV Shows',docs:'Documentaries'};
+  document.getElementById('results-title').textContent=S.search?'Results for "'+S.search+'"':(titles[S.tab]||'Results');
+  document.getElementById('results-count').textContent=S.items.length?S.items.length+' titles':'';
 }
 function updateLoadMoreBtn(loading) {
-  const btn = document.getElementById('load-more-btn');
-  btn.textContent = loading ? 'Loading…' : 'Load more ↓';
-  btn.disabled    = loading;
+  var btn=document.getElementById('load-more-btn');
+  btn.textContent=loading?'Loading…':'Load more ↓';
+  btn.disabled=loading;
 }
 function updateFilterCount() {
-  const n = (S.genre!=='all'?1:0) + (S.mood!=='all'?1:0);
-  const badge = document.getElementById('filter-active-count');
-  badge.style.display = n > 0 ? '' : 'none';
-  badge.textContent   = String(n);
+  var n=(S.genre!=='all'?1:0)+(S.mood!=='all'?1:0);
+  var badge=document.getElementById('filter-active-count');
+  badge.style.display=n>0?'':'none';
+  badge.textContent=String(n);
 }
 function wireCardActions() {
   document.querySelectorAll('.card-action-btn').forEach(function(btn){
-    btn.addEventListener('mouseenter', function(e){ showTooltip(e.currentTarget, e.currentTarget.title); });
-    btn.addEventListener('mouseleave', hideTooltip);
+    btn.addEventListener('mouseenter',function(e){showTooltip(e.currentTarget,e.currentTarget.title);});
+    btn.addEventListener('mouseleave',hideTooltip);
   });
 }
-function showTooltip(el, text) {
-  if (!text) return;
-  const t    = document.getElementById('tooltip');
-  const rect = el.getBoundingClientRect();
-  t.textContent = text;
-  t.style.left  = (rect.left + rect.width/2) + 'px';
-  t.style.top   = (rect.top - 34 + window.scrollY) + 'px';
+function showTooltip(el,text) {
+  if(!text) return;
+  var t=document.getElementById('tooltip'), rect=el.getBoundingClientRect();
+  t.textContent=text; t.style.left=(rect.left+rect.width/2)+'px'; t.style.top=(rect.top-34+window.scrollY)+'px';
   t.classList.add('visible');
 }
-function hideTooltip() { document.getElementById('tooltip').classList.remove('visible'); }
+function hideTooltip(){ document.getElementById('tooltip').classList.remove('visible'); }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════════════════
 function switchTabTo(tab) {
-  S.tab    = tab;
-  S.genre  = 'all';
-  S.mood   = 'all';
-  S.search = '';
-  const si = document.getElementById('search-input');
-  if (si) si.value = '';
-  document.getElementById('search-clear').style.display = 'none';
-
-  document.querySelectorAll('.nav-tab').forEach(function(t){
-    t.classList.toggle('active', t.dataset.page === tab);
-  });
-  const pages = { tv:'page-browse', docs:'page-browse', decide:'page-decide', mylist:'page-mylist' };
+  S.tab=tab; S.genre='all'; S.mood='all'; S.search='';
+  var si=document.getElementById('search-input');
+  if(si) si.value='';
+  document.getElementById('search-clear').style.display='none';
+  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.toggle('active',t.dataset.page===tab); });
+  var pages={movies:'page-browse',tv:'page-browse',docs:'page-browse',decide:'page-decide',mylist:'page-mylist'};
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById(pages[tab] || 'page-browse').classList.add('active');
-
-  if (tab === 'mylist')  { renderMyList(); return; }
-  if (tab === 'decide')  { return; }
-
+  document.getElementById(pages[tab]||'page-browse').classList.add('active');
+  if(tab==='mylist'){ renderMyList(); return; }
+  if(tab==='decide'){ return; }
   document.querySelectorAll('#mood-pills [data-mood]').forEach(function(p){
-    p.classList.toggle('active', p.dataset.mood === 'all');
+    p.classList.toggle('active',p.dataset.mood==='all');
   });
   updateFilterCount();
   buildGenrePills();
@@ -1334,132 +1431,107 @@ function switchTabTo(tab) {
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 function init() {
-  // Dark mode
-  if (S.dark) document.documentElement.dataset.theme = 'dark';
-  const darkBtn = document.getElementById('dark-toggle');
-  darkBtn.textContent = S.dark ? '☀️ Light' : '🌙 Dark';
-  darkBtn.onclick = function() {
-    S.dark = !S.dark;
-    saveLS('dark', S.dark);
-    document.documentElement.dataset.theme = S.dark ? 'dark' : '';
-    darkBtn.textContent = S.dark ? '☀️ Light' : '🌙 Dark';
+  if(S.dark) document.documentElement.dataset.theme='dark';
+  var darkBtn=document.getElementById('dark-toggle');
+  darkBtn.textContent=S.dark?'☀️ Light':'🌙 Dark';
+  darkBtn.onclick=function(){
+    S.dark=!S.dark; saveLS('dark',S.dark);
+    document.documentElement.dataset.theme=S.dark?'dark':'';
+    darkBtn.textContent=S.dark?'☀️ Light':'🌙 Dark';
   };
 
-  // Nav tabs
   document.querySelectorAll('.nav-tab').forEach(function(btn){
-    btn.addEventListener('click', function(){ switchTabTo(btn.dataset.page); });
+    btn.addEventListener('click',function(){ switchTabTo(btn.dataset.page); });
   });
 
-  // Search
-  const searchInput = document.getElementById('search-input');
-  const searchClear = document.getElementById('search-clear');
-  let   searchTimer;
-  searchInput.addEventListener('input', function() {
-    S.search = searchInput.value.trim();
-    searchClear.style.display = S.search ? '' : 'none';
+  var searchInput=document.getElementById('search-input');
+  var searchClear=document.getElementById('search-clear');
+  var searchTimer;
+  searchInput.addEventListener('input',function(){
+    S.search=searchInput.value.trim();
+    searchClear.style.display=S.search?'':'none';
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(function(){ fetchContent(false); }, 480);
+    searchTimer=setTimeout(function(){ fetchContent(false); },480);
   });
-  searchClear.addEventListener('click', function() {
-    searchInput.value = '';
-    S.search = '';
-    searchClear.style.display = 'none';
-    fetchContent(false);
+  searchClear.addEventListener('click',function(){
+    searchInput.value=''; S.search=''; searchClear.style.display='none'; fetchContent(false);
   });
 
-  // Filter panel toggle
-  const filterPanel = document.getElementById('filter-panel');
-  let   filterOpen  = false;
-  document.getElementById('filter-toggle-bar').addEventListener('click', function() {
-    filterOpen = !filterOpen;
-    filterPanel.style.display = filterOpen ? '' : 'none';
-    document.getElementById('filter-toggle-label').textContent = filterOpen ? 'Hide filters' : 'Show filters';
-    document.getElementById('filter-toggle-arrow').style.transform = filterOpen ? 'rotate(180deg)' : '';
+  var filterPanel=document.getElementById('filter-panel'), filterOpen=false;
+  document.getElementById('filter-toggle-bar').addEventListener('click',function(){
+    filterOpen=!filterOpen;
+    filterPanel.style.display=filterOpen?'':'none';
+    document.getElementById('filter-toggle-label').textContent=filterOpen?'Hide filters':'Show filters';
+    document.getElementById('filter-toggle-arrow').style.transform=filterOpen?'rotate(180deg)':'';
   });
 
-  // Mood pills
-  document.getElementById('mood-pills').addEventListener('click', function(e) {
-    const pill = e.target.closest('[data-mood]');
-    if (!pill) return;
-    S.mood = pill.dataset.mood;
-    document.querySelectorAll('#mood-pills [data-mood]').forEach(function(p){
-      p.classList.toggle('active', p.dataset.mood === S.mood);
-    });
-    updateFilterCount();
-    fetchContent(false);
+  document.getElementById('mood-pills').addEventListener('click',function(e){
+    var pill=e.target.closest('[data-mood]');
+    if(!pill) return;
+    S.mood=pill.dataset.mood;
+    document.querySelectorAll('#mood-pills [data-mood]').forEach(function(p){ p.classList.toggle('active',p.dataset.mood===S.mood); });
+    updateFilterCount(); fetchContent(false);
   });
 
-  // Sort btn — hidden for TVmaze (no sort param), repurposed as shuffle
-  const sortBtn = document.getElementById('sort-btn');
-  sortBtn.textContent = '🔀 Shuffle';
-  sortBtn.onclick = function() {
-    // Jump to a random page of TVmaze's catalogue
-    S.tvMazePage     = Math.floor(Math.random() * 50);
-    S.tvRawShows     = [];
-    S.tvDisplayStart = 0;
-    S.tvExhausted    = false;
-    fetchContent(false);
+  var sortBtn=document.getElementById('sort-btn');
+  sortBtn.textContent='🔥 Trending';
+  sortBtn.onclick=function(){
+    if(S.tab==='tv'){
+      // Shuffle TVmaze
+      S.tvMazePage=Math.floor(Math.random()*50); S.tvRawShows=[]; S.tvDisplayStart=0; S.tvExhausted=false;
+      fetchContent(false);
+    } else {
+      S.sortMode=S.sortMode==='popular'?'trending':'popular';
+      sortBtn.textContent=S.sortMode==='popular'?'🔥 Trending':'⭐ Popular';
+      fetchContent(false);
+    }
   };
 
-  // Load more
-  document.getElementById('load-more-btn').addEventListener('click', function(){
-    fetchContent(true);
+  document.getElementById('load-more-btn').addEventListener('click',function(){ fetchContent(true); });
+
+  document.getElementById('pick-btn').addEventListener('click',function(){
+    var pool=S.items.filter(function(i){return !S.watched.includes(i.id);});
+    if(!pool.length) return;
+    var pick=pool[Math.floor(Math.random()*pool.length)];
+    var reason=MOOD_REASONS[S.mood]||MOOD_REASONS['all'];
+    var poster=document.getElementById('pick-poster');
+    if(pick.poster){
+      poster.innerHTML='<img src="'+pick.poster+'" style="width:100%;height:100%;object-fit:cover">';
+    } else {
+      poster.style.background=getGradient(pick.genres);
+      poster.innerHTML='<span style="font-size:1.6rem">'+getEmoji(pick.genres)+'</span>';
+    }
+    document.getElementById('pick-title').textContent=pick.title+(pick.year?' ('+pick.year+')':'');
+    document.getElementById('pick-reason').textContent=reason;
+    document.getElementById('pick-result').style.display='';
+    document.getElementById('pick-open').onclick=function(){ openModal(pick.id); };
+    document.getElementById('pick-dismiss').onclick=function(){ document.getElementById('pick-result').style.display='none'; };
   });
 
-  // Pick for me
-  document.getElementById('pick-btn').addEventListener('click', function() {
-    const pool = S.items.filter(function(i){ return !S.watched.includes(i.id); });
-    if (!pool.length) return;
-    const pick   = pool[Math.floor(Math.random() * pool.length)];
-    const reason = MOOD_REASONS[S.mood] || MOOD_REASONS['all'];
-    const poster = document.getElementById('pick-poster');
-    poster.innerHTML = pick.poster
-      ? '<img src="'+pick.poster+'" style="width:100%;height:100%;object-fit:cover">'
-      : '📺';
-    document.getElementById('pick-title').textContent  = pick.title+(pick.year?' ('+pick.year+')':'');
-    document.getElementById('pick-reason').textContent = reason;
-    document.getElementById('pick-result').style.display = '';
-    document.getElementById('pick-open').onclick    = function(){ openModal(pick.id); };
-    document.getElementById('pick-dismiss').onclick = function(){ document.getElementById('pick-result').style.display='none'; };
-  });
-
-  // Empty state
-  document.getElementById('empty-relax').onclick = function() {
-    S.genre = 'all'; S.mood = 'all';
-    buildGenrePills();
-    document.querySelectorAll('#mood-pills [data-mood]').forEach(function(p){
-      p.classList.toggle('active', p.dataset.mood === 'all');
-    });
-    updateFilterCount();
-    fetchContent(false);
+  document.getElementById('empty-relax').onclick=function(){
+    S.genre='all'; S.mood='all'; buildGenrePills();
+    document.querySelectorAll('#mood-pills [data-mood]').forEach(function(p){ p.classList.toggle('active',p.dataset.mood==='all'); });
+    updateFilterCount(); fetchContent(false);
   };
-  document.getElementById('empty-decide').onclick = function(){ switchTabTo('decide'); };
+  document.getElementById('empty-decide').onclick=function(){ switchTabTo('decide'); };
 
-  // Modal
-  document.getElementById('modal-close').addEventListener('click', closeModal);
-  document.getElementById('media-modal').addEventListener('click', function(e){
-    if (e.target === e.currentTarget) closeModal();
-  });
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+  document.getElementById('modal-close').addEventListener('click',closeModal);
+  document.getElementById('media-modal').addEventListener('click',function(e){ if(e.target===e.currentTarget) closeModal(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
   document.querySelectorAll('.modal-tab').forEach(function(tab){
-    tab.addEventListener('click', function(){ switchModalTab(tab.dataset.mtab); });
+    tab.addEventListener('click',function(){ switchModalTab(tab.dataset.mtab); });
   });
 
-  // Decide page
   document.querySelectorAll('.decide-type-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      S.decideType = btn.dataset.dtype;
-      document.querySelectorAll('.decide-type-btn').forEach(function(b){
-        b.classList.toggle('active', b.dataset.dtype === S.decideType);
-      });
+    btn.addEventListener('click',function(){
+      S.decideType=btn.dataset.dtype;
+      document.querySelectorAll('.decide-type-btn').forEach(function(b){ b.classList.toggle('active',b.dataset.dtype===S.decideType); });
     });
   });
   document.querySelectorAll('[data-dmood]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      S.decideMood = btn.dataset.dmood;
-      document.querySelectorAll('[data-dmood]').forEach(function(b){
-        b.classList.toggle('active', b.dataset.dmood === S.decideMood);
-      });
+    btn.addEventListener('click',function(){
+      S.decideMood=btn.dataset.dmood;
+      document.querySelectorAll('[data-dmood]').forEach(function(b){ b.classList.toggle('active',b.dataset.dmood===S.decideMood); });
     });
   });
 
@@ -1471,5 +1543,12 @@ function init() {
 document.addEventListener('DOMContentLoaded', init);
 
 </script>
+
+<!-- Trakt attribution (required per commercial-use agreement with Trakt) -->
+<footer style="text-align:center;padding:1.5rem 1rem 2rem;font-size:.72rem;color:rgba(200,180,255,.35);font-family:'DM Sans',sans-serif">
+  Movie data powered by <a href="https://trakt.tv" target="_blank" rel="noopener" style="color:rgba(200,180,255,.55);text-decoration:underline">Trakt.tv</a>
+  &nbsp;·&nbsp;
+  TV data powered by <a href="https://www.tvmaze.com" target="_blank" rel="noopener" style="color:rgba(200,180,255,.55);text-decoration:underline">TVmaze</a>
+</footer>
 </body>
 </html>
